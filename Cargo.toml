@@ -12,7 +12,7 @@
 [package]
 edition = "2021"
 name = "extension-trait"
-version = "1.0.3"
+version = "1.0.4"
 authors = ["Konrad Borowski <konrad@borowski.pw>"]
 description = "Macro to declare extension traits"
 documentation = "https://docs.rs/extension-trait"
