@@ -56,7 +56,34 @@ impl Parse for ItemImplWithVisibility {
 /// ```
 #[proc_macro_attribute]
 pub fn extension_trait(args: TokenStream, input: TokenStream) -> TokenStream {
-    parse_macro_input!(args as Nothing);
+    let bound = match syn::parse::<Nothing>(args.clone()) {
+        Ok(v) => Some(v),
+        Err(_) => None,
+    };
+    let trait_bounds = match bound {
+        Some(_) => quote!(),
+        None => {
+            let args: proc_macro2::TokenStream = args.into();
+            quote!( : #args)
+        }
+    };
+    // let bound = if bound.is_none() {
+    //     Some(AttributeEnum::Bounds(
+    //         syn::parse::<Bounds>(args.clone()).unwrap().bounds,
+    //     ))
+    // } else {
+    //     bound
+    // };
+    // let trait_bounds = match bound {
+    //     Some(attr) => match attr {
+    //         AttributeEnum::Nothing(_) => quote!(),
+    //         AttributeEnum::Bounds(bounds) => quote!( : #bounds),
+    //     },
+
+    //     None => syn::Error::new(Span::call_site(), format!("unsupported item type {}", args))
+    //         .to_compile_error(),
+    // };
+
     let ItemImplWithVisibility {
         attrs,
         visibility,
@@ -209,7 +236,7 @@ pub fn extension_trait(args: TokenStream, input: TokenStream) -> TokenStream {
     if let Some((None, path, _)) = trait_ {
         (quote! {
             #(#attrs)*
-            #visibility #unsafety trait #path {
+            #visibility #unsafety trait #path #trait_bounds {
                 #(#trait_items)*
             }
             #impl_item

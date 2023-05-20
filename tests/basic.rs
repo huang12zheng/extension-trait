@@ -227,7 +227,7 @@ fn struct_pattern() {
     assert_eq!(i32::x(X { a: 1, b: 2 }), 3);
 }
 
-#[extension_trait]
+#[extension_trait(Clone)]
 pub impl IUncontrolledProviderScope for u32 {
     type ProviderContainer: PartialEq = u32;
 }

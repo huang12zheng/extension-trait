@@ -24,7 +24,7 @@ impl Parse for ImplItemBound {
         let type_token: Token![type] = input.parse()?;
         let ident: Ident = input.parse()?;
         let mut generics: Generics = input.parse()?;
-        let (colon_token, bounds) = parse_optional_bounds(input)?;
+        let (colon_token, bounds) = parse_optional_bounds_with_colon(input)?;
         let eq_token: Token![=] = input.parse()?;
         let expr: Expr = input.parse()?;
         generics.where_clause = input.parse()?;
@@ -43,11 +43,29 @@ impl Parse for ImplItemBound {
     }
 }
 
-fn parse_optional_bounds(
+fn parse_optional_bounds_with_colon(
     input: ParseStream,
 ) -> Result<(Token![:], Punctuated<TypeParamBound, Token![+]>)> {
     let colon_token: Token![:] = input.parse()?;
 
+    let bounds = parse_optional_bounds(input)?;
+
+    Ok((colon_token, bounds))
+}
+pub struct Bounds {
+    pub bounds: Punctuated<TypeParamBound, token::Plus>,
+}
+impl Parse for Bounds {
+    fn parse(input: ParseStream) -> Result<Self> {
+        Ok(Bounds {
+            bounds: parse_optional_bounds(input)?,
+        })
+    }
+}
+
+pub fn parse_optional_bounds(
+    input: &parse::ParseBuffer,
+) -> Result<Punctuated<TypeParamBound, token::Plus>> {
     let mut bounds = Punctuated::new();
     loop {
         if input.peek(Token![where]) || input.peek(Token![=]) || input.peek(Token![;]) {
@@ -59,6 +77,5 @@ fn parse_optional_bounds(
         }
         bounds.push_punct(input.parse::<Token![+]>()?);
     }
-
-    Ok((colon_token, bounds))
+    Ok(bounds)
 }
