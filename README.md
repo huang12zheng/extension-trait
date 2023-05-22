@@ -1,3 +1,8 @@
+https://github.com/xfix/extension-trait/issues/11
+
+This create is no longer maintained, consider using extend or easy-ext instead.
+
+
 # extension-trait
 
 A macro to declare extension traits - a trait that is created to add
